@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% block title %}Security Architecture &bull; DevHub{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-8 my-6">
+
+  <!-- Header Banner -->
+  <div class="bg-gradient-to-r from-emerald-950/40 via-teal-950/20 to-gh-canvas border border-emerald-700/50 rounded-2xl p-8 shadow-xl">
+    <div class="flex items-center gap-3 text-emerald-400 mb-2">
+      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+      </svg>
+      <span class="text-xs uppercase tracking-widest font-bold">Privacy &amp; PC Safety Guarantee</span>
+    </div>
+    <h1 class="text-3xl font-extrabold text-white tracking-tight">Security &amp; Local PC Architecture</h1>
+    <p class="text-sm text-gh-text mt-2 max-w-2xl">
+      DevHub is architected from the ground up to ensure you can run, test, and host your developer social network without any risk to your personal computer, operating system, or private data.
+    </p>
+  </div>
+
+  <!-- Key Security Guarantees Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    <!-- Card 1: Local-First Isolation -->
+    <div class="bg-gh-canvas border border-gh-border rounded-xl p-6 shadow-sm space-y-3">
+      <div class="w-10 h-10 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+      </div>
+      <h2 class="text-base font-bold text-white">Local-First Sandbox</h2>
+      <p class="text-xs text-gh-muted leading-relaxed">
+        The application binds to your machine's loopback interface (<code class="text-emerald-400 font-mono">127.0.0.1</code>) by default. It does not open exposed firewall ports, does not communicate with external tracking servers, and requires no administrative privileges.
+      </p>
+    </div>
+
+    <!-- Card 2: Password & Account Security -->
+    <div class="bg-gh-canvas border border-gh-border rounded-xl p-6 shadow-sm space-y-3">
+      <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+      </div>
+      <h2 class="text-base font-bold text-white">Cryptographic Password Hashing</h2>
+      <p class="text-xs text-gh-muted leading-relaxed">
+        Passwords are never stored in plaintext. They are protected using memory-hard cryptographic key derivation functions (<code class="text-emerald-400 font-mono">scrypt</code> / <code class="text-emerald-400 font-mono">pbkdf2:sha256</code>) with individual cryptographic salts, preventing rainbow table and brute-force attacks.
+      </p>
+    </div>
+
+    <!-- Card 3: XSS & Injection Prevention -->
+    <div class="bg-gh-canvas border border-gh-border rounded-xl p-6 shadow-sm space-y-3">
+      <div class="w-10 h-10 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+        </svg>
+      </div>
+      <h2 class="text-base font-bold text-white">Strict XSS &amp; HTML Sanitization</h2>
+      <p class="text-xs text-gh-muted leading-relaxed">
+        Markdown in posts, comments, and project README files is strictly sanitized via <code class="text-purple-400 font-mono">bleach</code> with an allowed whitelist. Malicious scripts, event handlers (<code class="font-mono">onload</code>, <code class="font-mono">onerror</code>), and iframe exploits are stripped out automatically.
+      </p>
+    </div>
+
+    <!-- Card 4: Path Traversal & Safe File Handling -->
+    <div class="bg-gh-canvas border border-gh-border rounded-xl p-6 shadow-sm space-y-3">
+      <div class="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+      </div>
+      <h2 class="text-base font-bold text-white">Path Traversal &amp; ZIP Safety</h2>
+      <p class="text-xs text-gh-muted leading-relaxed">
+        Project downloads stream ZIP files directly in memory using Python's standard library. File access strictly validates directory boundaries (<code class="text-amber-400 font-mono">os.path.commonpath</code>), completely preventing malicious file viewing outside the sandbox.
+      </p>
+    </div>
+
+  </div>
+
+  <!-- Detailed Safeguards Table -->
+  <div class="bg-gh-canvas border border-gh-border rounded-xl p-6 shadow-sm">
+    <h2 class="text-base font-bold text-white mb-4">Security Implementation Matrix</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full text-xs text-left">
+        <thead>
+          <tr class="border-b border-gh-border text-gh-muted uppercase">
+            <th class="py-2.5 pr-4">Security Domain</th>
+            <th class="py-2.5 px-4">Standard Risk</th>
+            <th class="py-2.5 pl-4">DevHub Implementation</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gh-border/60">
+          <tr>
+            <td class="py-3 pr-4 font-semibold text-white">Local System Integrity</td>
+            <td class="py-3 px-4 text-rose-400">Rogue background processes &amp; root daemon installs</td>
+            <td class="py-3 pl-4 text-emerald-400 font-medium">Standard user space execution; portable virtual environment with zero system pollution.</td>
+          </tr>
+          <tr>
+            <td class="py-3 pr-4 font-semibold text-white">Database Engine</td>
+            <td class="py-3 px-4 text-rose-400">Exposed open SQL ports on local network</td>
+            <td class="py-3 pl-4 text-emerald-400 font-medium">Self-contained SQLite file-based database with SQLAlchemy ORM parameterization.</td>
+          </tr>
+          <tr>
+            <td class="py-3 pr-4 font-semibold text-white">Session Management</td>
+            <td class="py-3 px-4 text-rose-400">Session hijacking via JavaScript theft</td>
+            <td class="py-3 pl-4 text-emerald-400 font-medium">HttpOnly cookies, SameSite=Lax enforcement, and per-installation secret keys.</td>
+          </tr>
+          <tr>
+            <td class="py-3 pr-4 font-semibold text-white">Brute Force Protection</td>
+            <td class="py-3 px-4 text-rose-400">Credential stuffing &amp; dictionary attacks</td>
+            <td class="py-3 pl-4 text-emerald-400 font-medium">Built-in rate limiter locks failed attempts automatically for 5 minutes.</td>
+          </tr>
+          <tr>
+            <td class="py-3 pr-4 font-semibold text-white">CSRF Defense</td>
+            <td class="py-3 px-4 text-rose-400">Cross-site request forgery attacks</td>
+            <td class="py-3 pl-4 text-emerald-400 font-medium">Cryptographic CSRF session tokens validated on mutating HTTP requests.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
