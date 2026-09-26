@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block title %}Settings &bull; {{ project.name }} &bull; DevHub{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto my-6 space-y-6">
+
+  <!-- Repository Settings Card -->
+  <div class="bg-gh-canvas border border-gh-border rounded-xl p-8 shadow-sm">
+    <div class="border-b border-gh-border pb-4 mb-6">
+      <h1 class="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+        <svg class="w-6 h-6 text-gh-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Repository Settings: {{ project.name }}
+      </h1>
+      <p class="text-xs text-gh-muted mt-1">Manage project metadata, README documentation, and access</p>
+    </div>
+
+    <form method="POST" action="{{ url_for('projects.edit_project', project_id=project.id) }}" class="space-y-5">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <div>
+        <label for="tagline" class="block text-xs font-semibold text-gh-text uppercase tracking-wider mb-1.5">Tagline</label>
+        <input type="text" id="tagline" name="tagline" value="{{ project.tagline }}"
+          class="w-full bg-gh-bg border border-gh-border rounded-lg px-3.5 py-2 text-sm text-gh-text focus:border-gh-accent focus:outline-none transition-colors">
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label for="primary_language" class="block text-xs font-semibold text-gh-text uppercase tracking-wider mb-1.5">Primary Language</label>
+          <select id="primary_language" name="primary_language" class="w-full bg-gh-bg border border-gh-border rounded-lg px-3.5 py-2 text-sm text-gh-text focus:border-gh-accent focus:outline-none">
+            {% for lang in ['Python', 'JavaScript', 'TypeScript', 'Rust', 'Go', 'C++', 'Java', 'HTML', 'CSS', 'Other'] %}
+              <option value="{{ lang }}" {% if project.primary_language == lang %}selected{% endif %}>{{ lang }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="license" class="block text-xs font-semibold text-gh-text uppercase tracking-wider mb-1.5">License</label>
+          <select id="license" name="license" class="w-full bg-gh-bg border border-gh-border rounded-lg px-3.5 py-2 text-sm text-gh-text focus:border-gh-accent focus:outline-none">
+            {% for lic in ['MIT', 'Apache-2.0', 'GPL-3.0', 'BSD-3-Clause', 'Unlicense'] %}
+              <option value="{{ lic }}" {% if project.license == lic %}selected{% endif %}>{{ lic }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label for="topics" class="block text-xs font-semibold text-gh-text uppercase tracking-wider mb-1.5">Topics &amp; Tags</label>
+        <input type="text" id="topics" name="topics" value="{{ project.topics }}"
+          class="w-full bg-gh-bg border border-gh-border rounded-lg px-3.5 py-2 text-sm text-gh-text focus:border-gh-accent focus:outline-none transition-colors">
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label for="github_url" class="block text-xs font-semibold text-gh-text uppercase tracking-wider mb-1.5">GitHub Mirror URL</label>
+          <input type="url" id="github_url" name="github_url" value="{{ project.github_url }}"
+            class="w-full bg-gh-bg border border-gh-border rounded-lg px-3.5 py-2 text-sm text-gh-text focus:border-gh-accent focus:outline-none transition-colors">
+        </div>
+        <div>
+          <label for="demo_url" class="block text-xs font-semibold text-gh-text uppercase tracking-wider mb-1.5">Live Demo URL</label>
+          <input type="url" id="demo_url" name="demo_url" value="{{ project.demo_url }}"
+            class="w-full bg-gh-bg border border-gh-border rounded-lg px-3.5 py-2 text-sm text-gh-text focus:border-gh-accent focus:outline-none transition-colors">
+        </div>
+      </div>
+
+      <div>
+        <label for="readme_content" class="block text-xs font-semibold text-gh-text uppercase tracking-wider mb-1.5">Edit README.md (Markdown)</label>
+        <textarea id="readme_content" name="readme_content" rows="10"
+          class="w-full bg-gh-bg border border-gh-border rounded-lg p-3 text-xs font-mono text-gh-text focus:border-gh-accent focus:outline-none transition-colors">{{ project.readme_content }}</textarea>
+      </div>
+
+      <div class="flex items-center gap-6 pt-2">
+        <label class="flex items-center gap-2 cursor-pointer select-none text-xs text-gh-text">
+          <input type="checkbox" name="is_pinned" {% if project.is_pinned %}checked{% endif %} class="rounded bg-gh-bg border-gh-border text-emerald-500 focus:ring-0">
+          <span>Pin to profile showcase</span>
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer select-none text-xs text-gh-text">
+          <input type="checkbox" name="is_public" value="1" {% if project.is_public %}checked{% endif %} class="rounded bg-gh-bg border-gh-border text-emerald-500 focus:ring-0">
+          <span>Public repository</span>
+        </label>
+      </div>
+
+      <div class="pt-4 border-t border-gh-border flex justify-end gap-3">
+        <a href="{{ url_for('projects.view_project', project_id=project.id) }}" class="px-4 py-2 rounded-lg text-sm text-gh-muted hover:text-white transition-colors">Cancel</a>
+        <button type="submit" class="bg-gh-green hover:bg-gh-greenHover text-white font-semibold py-2 px-6 rounded-lg shadow text-sm transition-colors">
+          Save Changes
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Danger Zone Card -->
+  <div class="bg-gh-canvas border border-rose-900/60 rounded-xl p-6 shadow-sm">
+    <h2 class="text-base font-bold text-rose-400 mb-1">Danger Zone</h2>
+    <p class="text-xs text-gh-muted mb-4">Deleting this repository will remove all files, issues, and discussions associated with it.</p>
+    <form action="{{ url_for('projects.delete_project', project_id=project.id) }}" method="POST" onsubmit="return confirm('Are you absolutely sure you want to delete this repository? This cannot be undone.');">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="bg-rose-900/40 hover:bg-rose-800 text-rose-300 font-semibold px-4 py-2 rounded-lg text-xs border border-rose-700/60 transition-colors">
+        Delete Repository
+      </button>
+    </form>
+  </div>
+
+</div>
+{% endblock %}
