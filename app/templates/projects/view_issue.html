@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block title %}#{{ issue.id }} {{ issue.title }} &bull; {{ project.name }} &bull; DevHub{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto my-6 space-y-6">
+
+  <!-- Issue Header -->
+  <div class="bg-gh-canvas border border-gh-border rounded-xl p-6 shadow-sm">
+    <div class="text-xs text-gh-muted mb-2">
+      <a href="{{ url_for('projects.view_project', project_id=project.id) }}" class="text-gh-accent hover:underline">{{ project.name }}</a>
+      <span>/</span>
+      <a href="{{ url_for('projects.list_issues', project_id=project.id) }}" class="text-gh-accent hover:underline">Issues</a>
+      <span>/</span>
+      <span class="text-white">#{{ issue.id }}</span>
+    </div>
+
+    <div class="flex items-start justify-between gap-4 flex-wrap">
+      <h1 class="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+        <span>{{ issue.title }}</span>
+        <span class="text-gh-muted font-normal">#{{ issue.id }}</span>
+      </h1>
+
+      <!-- Status Toggle Button (Owner or Author) -->
+      {% if current_user.is_authenticated and (current_user.id == project.user_id or current_user.id == issue.user_id) %}
+        <form action="{{ url_for('projects.toggle_issue_status', project_id=project.id, issue_id=issue.id) }}" method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          {% if issue.status == 'open' %}
+            <button type="submit" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-950/60 border border-purple-700/60 text-purple-300 hover:bg-purple-900 transition-colors flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              Close Issue
+            </button>
+          {% else %}
+            <button type="submit" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-950/60 border border-emerald-700/60 text-emerald-300 hover:bg-emerald-900 transition-colors flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              Reopen Issue
+            </button>
+          {% endif %}
+        </form>
+      {% endif %}
+    </div>
+
+    <!-- Status Badge & Subtext -->
+    <div class="flex items-center gap-3 mt-3 text-xs text-gh-muted">
+      {% if issue.status == 'open' %}
+        <span class="inline-flex items-center gap-1 bg-emerald-950/60 border border-emerald-600/60 text-emerald-300 px-2.5 py-1 rounded-full font-semibold">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Open
+        </span>
+      {% else %}
+        <span class="inline-flex items-center gap-1 bg-purple-950/60 border border-purple-600/60 text-purple-300 px-2.5 py-1 rounded-full font-semibold">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          Closed
+        </span>
+      {% endif %}
+
+      <span>
+        <a href="{{ url_for('profile.view_profile', username=issue.author.username) }}" class="font-medium text-white hover:underline">{{ issue.author.username }}</a>
+        opened this issue {{ issue.created_time_ago }} &bull; {{ comments|length }} comments
+      </span>
+    </div>
+  </div>
+
+  <!-- Original Issue Body Card -->
+  <div class="bg-gh-canvas border border-gh-border rounded-xl overflow-hidden shadow-sm">
+    <div class="bg-gh-subtle/80 px-4 py-2.5 border-b border-gh-border flex items-center justify-between text-xs text-gh-muted">
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-white">{{ issue.author.username }}</span>
+        <span>commented {{ issue.created_time_ago }}</span>
+      </div>
+      <span class="text-[11px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded bg-gh-canvas border border-gh-border">{{ issue.label }}</span>
+    </div>
+    <div class="p-5 markdown-body">
+      {{ issue.formatted_body|safe if issue.body else '<em class="text-gh-muted">No description provided.</em>'|safe }}
+    </div>
+  </div>
+
+  <!-- Threaded Comments -->
+  {% for c in comments %}
+    <div class="bg-gh-canvas border border-gh-border rounded-xl overflow-hidden shadow-sm">
+      <div class="bg-gh-subtle/80 px-4 py-2.5 border-b border-gh-border flex items-center justify-between text-xs text-gh-muted">
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-white">{{ c.author.username }}</span>
+          <span>commented {{ c.created_time_ago }}</span>
+        </div>
+      </div>
+      <div class="p-5 markdown-body">
+        {{ c.formatted_body|safe }}
+      </div>
+    </div>
+  {% endfor %}
+
+  <!-- Add Comment Form -->
+  {% if current_user.is_authenticated %}
+    <div class="bg-gh-canvas border border-gh-border rounded-xl p-5 shadow-sm">
+      <h2 class="text-sm font-bold text-white mb-3">Leave a comment</h2>
+      <form action="{{ url_for('projects.comment_issue', project_id=project.id, issue_id=issue.id) }}" method="POST" class="space-y-3">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <textarea name="body" rows="4" required placeholder="Write your response... (Markdown supported)"
+          class="w-full bg-gh-bg border border-gh-border rounded-lg p-3 text-sm text-gh-text focus:border-gh-accent focus:outline-none transition-colors"></textarea>
+        <div class="flex justify-end">
+          <button type="submit" class="bg-gh-green hover:bg-gh-greenHover text-white text-xs font-semibold py-2 px-5 rounded-lg shadow transition-colors">
+            Comment
+          </button>
+        </div>
+      </form>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}
