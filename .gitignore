@@ -1,0 +1,34 @@
+# Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python cache & artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Local sensitive files
+.secret_key
+.env
+*.log
+
+# Local SQLite databases (created automatically on first run)
+*.sqlite
+*.sqlite3
+devhub.db
+
+# User uploaded media
+uploads/avatars/*
+uploads/projects/*
+!uploads/avatars/.gitkeep
+!uploads/projects/.gitkeep
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
