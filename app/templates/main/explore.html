@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% block title %}Explore Projects &amp; Developers &bull; DevHub{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+  <!-- Search & Filter Header -->
+  <div class="bg-gh-canvas border border-gh-border rounded-xl p-6 shadow-sm">
+    <h1 class="text-2xl font-bold text-white tracking-tight">Explore the Developer Community</h1>
+    <p class="text-sm text-gh-muted mt-1">Discover trending open-source projects, insightful code snippets, and active developers</p>
+
+    <!-- Search Form -->
+    <form action="{{ url_for('main.explore') }}" method="GET" class="mt-4 flex flex-col sm:flex-row gap-3">
+      <input type="hidden" name="category" value="{{ category }}">
+      <div class="relative flex-1">
+        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gh-muted">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </div>
+        <input type="text" name="q" value="{{ query }}" placeholder="Search by name, language, tag, or developer..."
+          class="w-full bg-gh-bg border border-gh-border rounded-lg pl-10 pr-4 py-2.5 text-sm text-gh-text placeholder-gh-muted focus:border-gh-accent focus:ring-1 focus:ring-gh-accent focus:outline-none transition-colors">
+      </div>
+      <button type="submit" class="bg-gh-green hover:bg-gh-greenHover text-white text-sm font-semibold px-6 py-2.5 rounded-lg shadow transition-colors">
+        Search
+      </button>
+    </form>
+
+    <!-- Popular Tags Pills -->
+    <div class="mt-4 flex items-center gap-2 flex-wrap text-xs">
+      <span class="text-gh-muted font-medium">Hot Topics:</span>
+      {% for t in popular_tags %}
+        <a href="{{ url_for('main.explore', tag=t) }}"
+          class="px-2.5 py-1 rounded-full border border-gh-border bg-gh-subtle/80 hover:bg-gh-subtle hover:text-gh-accent text-gh-text transition-colors {% if tag == t %}border-gh-accent text-gh-accent bg-gh-accent/10{% endif %}">
+          #{{ t }}
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Category Filter Tabs -->
+  <div class="flex items-center gap-2 border-b border-gh-border pb-2 text-sm">
+    <a href="{{ url_for('main.explore', q=query, tag=tag, category='all') }}"
+      class="px-3 py-1.5 rounded-lg font-medium transition-colors {% if category == 'all' %}bg-gh-subtle text-white border border-gh-border{% else %}text-gh-muted hover:text-white{% endif %}">
+      All Results
+    </a>
+    <a href="{{ url_for('main.explore', q=query, tag=tag, category='projects') }}"
+      class="px-3 py-1.5 rounded-lg font-medium transition-colors {% if category == 'projects' %}bg-gh-subtle text-white border border-gh-border{% else %}text-gh-muted hover:text-white{% endif %}">
+      Repositories ({{ projects|length }})
+    </a>
+    <a href="{{ url_for('main.explore', q=query, tag=tag, category='users') }}"
+      class="px-3 py-1.5 rounded-lg font-medium transition-colors {% if category == 'users' %}bg-gh-subtle text-white border border-gh-border{% else %}text-gh-muted hover:text-white{% endif %}">
+      Developers ({{ users|length }})
+    </a>
+    <a href="{{ url_for('main.explore', q=query, tag=tag, category='posts') }}"
+      class="px-3 py-1.5 rounded-lg font-medium transition-colors {% if category == 'posts' %}bg-gh-subtle text-white border border-gh-border{% else %}text-gh-muted hover:text-white{% endif %}">
+      Posts ({{ posts|length }})
+    </a>
+  </div>
+
+  <!-- Repositories Grid / List -->
+  {% if projects %}
+    <div>
+      <h2 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+        <svg class="w-5 h-5 text-gh-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+        Featured &amp; Matching Repositories
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% for project in projects %}
+          <div class="bg-gh-canvas border border-gh-border rounded-xl p-5 shadow-sm hover:border-gh-muted/60 transition-colors flex flex-col justify-between">
+            <div>
+              <div class="flex items-start justify-between gap-3">
+                <a href="{{ url_for('projects.view_project', project_id=project.id) }}" class="font-bold text-base text-gh-accent hover:underline flex items-center gap-1.5">
+                  <svg class="w-4 h-4 text-gh-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                  <span class="break-all">{{ project.author.username }}/{{ project.name }}</span>
+                </a>
+
+                {% if current_user.is_authenticated %}
+                  <button type="button" onclick="toggleStar({{ project.id }}, this)"
+                    class="px-2.5 py-1 rounded-md text-xs font-semibold border border-gh-border bg-gh-subtle hover:bg-gh-border text-white flex items-center gap-1.5 transition-colors flex-shrink-0">
+                    <svg class="w-3.5 h-3.5 star-icon {% if current_user.has_starred(project) %}fill-amber-400 text-amber-400{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                    </svg>
+                    <span class="star-text">{% if current_user.has_starred(project) %}Starred{% else %}Star{% endif %}</span>
+                    <span class="star-count font-mono">{{ project.stars_count }}</span>
+                  </button>
+                {% endif %}
+              </div>
+
+              <p class="text-xs text-gh-text mt-2 line-clamp-2">{{ project.tagline or project.description or 'No description provided.' }}</p>
+
+              <!-- Topic Tags -->
+              {% if project.topic_list %}
+                <div class="flex items-center gap-1.5 flex-wrap mt-3">
+                  {% for t in project.topic_list %}
+                    <a href="{{ url_for('main.explore', tag=t) }}" class="text-[11px] font-medium bg-gh-accent/10 text-gh-accent hover:bg-gh-accent/20 px-2 py-0.5 rounded-full transition-colors">
+                      {{ t }}
+                    </a>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- Repository Footer -->
+            <div class="mt-4 pt-3 border-t border-gh-border flex items-center justify-between text-xs text-gh-muted">
+              <div class="flex items-center gap-4">
+                <span class="flex items-center gap-1.5 text-gh-text">
+                  <span class="w-2.5 h-2.5 rounded-full" style="background-color: {{ project.language_color }};"></span>
+                  {{ project.primary_language }}
+                </span>
+                <span class="flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                  {{ project.stars_count }}
+                </span>
+                {% if project.license %}
+                  <span>{{ project.license }}</span>
+                {% endif %}
+              </div>
+              <span>Updated {{ project.updated_time_ago }}</span>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Developers Section -->
+  {% if users %}
+    <div class="mt-8">
+      <h2 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+        <svg class="w-5 h-5 text-gh-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        Developers
+      </h2>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {% for u in users %}
+          <div class="bg-gh-canvas border border-gh-border rounded-xl p-4 text-center hover:border-gh-muted/60 transition-colors flex flex-col justify-between">
+            <div>
+              <div class="w-16 h-16 mx-auto rounded-full overflow-hidden border-2 border-gh-border mb-3">
+                {% if u.avatar_path %}
+                  <img src="{{ url_for('profile.serve_avatar', filename=u.avatar_path) }}" alt="{{ u.username }}" class="w-full h-full object-cover">
+                {% else %}
+                  {{ get_avatar_svg(u.display_name)|safe }}
+                {% endif %}
+              </div>
+              <a href="{{ url_for('profile.view_profile', username=u.username) }}" class="font-bold text-sm text-white hover:text-gh-accent block">
+                {{ u.display_name }}
+              </a>
+              <p class="text-xs text-gh-muted">@{{ u.username }}</p>
+              <p class="text-xs text-gh-text mt-2 line-clamp-2">{{ u.title or 'Developer' }}</p>
+
+              {% if u.skill_list %}
+                <div class="flex items-center justify-center gap-1 flex-wrap mt-3">
+                  {% for s in u.skill_list[:3] %}
+                    <span class="text-[10px] bg-gh-subtle text-gh-muted px-2 py-0.5 rounded">{{ s }}</span>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-gh-border flex items-center justify-between">
+              <span class="text-xs text-gh-muted">{{ u.projects.count() }} repos</span>
+              {% if current_user.is_authenticated and current_user.id != u.id %}
+                <button type="button" onclick="toggleFollow({{ u.id }}, this)"
+                  class="px-3 py-1 text-xs font-semibold rounded-md border border-gh-border bg-gh-subtle hover:bg-gh-border text-white transition-colors">
+                  {% if current_user.is_following(u) %}Following{% else %}Follow{% endif %}
+                </button>
+              {% else %}
+                <a href="{{ url_for('profile.view_profile', username=u.username) }}" class="text-xs text-gh-accent hover:underline">View Profile</a>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}
