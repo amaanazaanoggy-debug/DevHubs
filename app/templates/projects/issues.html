@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block title %}Issues &bull; {{ project.name }} &bull; DevHub{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+  <!-- Repository Sub Header -->
+  <div class="bg-gh-canvas border border-gh-border rounded-xl p-5 shadow-sm">
+    <div class="flex items-center justify-between flex-wrap gap-4">
+      <div class="flex items-center gap-2 text-sm">
+        <a href="{{ url_for('projects.view_project', project_id=project.id) }}" class="text-gh-accent hover:underline font-semibold flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-gh-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+          {{ project.author.username }} / {{ project.name }}
+        </a>
+        <span class="text-gh-muted">/</span>
+        <span class="font-bold text-white">Issues</span>
+      </div>
+
+      {% if current_user.is_authenticated %}
+        <a href="{{ url_for('projects.create_issue', project_id=project.id) }}" class="bg-gh-green hover:bg-gh-greenHover text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow transition-colors">
+          New Issue
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Issues List Container -->
+  <div class="bg-gh-canvas border border-gh-border rounded-xl overflow-hidden shadow-sm">
+    
+    <!-- Status Filter Bar -->
+    <div class="bg-gh-subtle/80 px-4 py-3 border-b border-gh-border flex items-center justify-between text-xs">
+      <div class="flex items-center gap-4">
+        <a href="{{ url_for('projects.list_issues', project_id=project.id, status='open') }}"
+          class="flex items-center gap-1.5 font-semibold transition-colors {% if status_filter == 'open' %}text-white{% else %}text-gh-muted hover:text-white{% endif %}">
+          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>{{ open_count }} Open</span>
+        </a>
+        <a href="{{ url_for('projects.list_issues', project_id=project.id, status='closed') }}"
+          class="flex items-center gap-1.5 font-semibold transition-colors {% if status_filter == 'closed' %}text-white{% else %}text-gh-muted hover:text-white{% endif %}">
+          <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>{{ closed_count }} Closed</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Issues Table -->
+    <div class="divide-y divide-gh-border/60">
+      {% for issue in issues %}
+        <div class="p-4 flex items-start justify-between gap-4 hover:bg-gh-subtle/30 transition-colors">
+          <div class="flex items-start gap-3">
+            {% if issue.status == 'open' %}
+              <svg class="w-4 h-4 text-emerald-400 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            {% else %}
+              <svg class="w-4 h-4 text-purple-400 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            {% endif %}
+
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <a href="{{ url_for('projects.view_issue', project_id=project.id, issue_id=issue.id) }}" class="font-bold text-sm text-white hover:text-gh-accent">
+                  {{ issue.title }}
+                </a>
+                
+                <!-- Label badge -->
+                <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full border
+                  {% if issue.label == 'bug' %}bg-rose-950/40 border-rose-700/60 text-rose-300
+                  {% elif issue.label == 'enhancement' %}bg-sky-950/40 border-sky-700/60 text-sky-300
+                  {% elif issue.label == 'question' %}bg-amber-950/40 border-amber-700/60 text-amber-300
+                  {% else %}bg-gh-subtle border-gh-border text-gh-muted{% endif %}">
+                  {{ issue.label }}
+                </span>
+              </div>
+
+              <div class="text-xs text-gh-muted mt-1">
+                #{{ issue.id }} opened {{ issue.created_time_ago }} by
+                <a href="{{ url_for('profile.view_profile', username=issue.author.username) }}" class="hover:underline text-gh-text font-medium">{{ issue.author.username }}</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Comments Count -->
+          {% if issue.comments.count() > 0 %}
+            <div class="flex items-center gap-1 text-xs text-gh-muted">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+              <span>{{ issue.comments.count() }}</span>
+            </div>
+          {% endif %}
+        </div>
+      {% else %}
+        <div class="p-8 text-center text-xs text-gh-muted">
+          No {{ status_filter }} issues found for this project.
+        </div>
+      {% endfor %}
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
