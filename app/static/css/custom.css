@@ -1,0 +1,103 @@
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0d1117;
+}
+::-webkit-scrollbar-thumb {
+  background: #30363d;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #484f58;
+}
+
+/* Markdown rendered body formatting (GitHub Dark Style) */
+.markdown-body {
+  color: #c9d1d9;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+.markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4 {
+  color: #f0f6fc;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid #21262d;
+  padding-bottom: 0.3rem;
+}
+.markdown-body h1 { font-size: 1.75rem; }
+.markdown-body h2 { font-size: 1.4rem; }
+.markdown-body h3 { font-size: 1.15rem; }
+.markdown-body p { margin-bottom: 1rem; }
+.markdown-body a { color: #58a6ff; text-decoration: none; }
+.markdown-body a:hover { text-decoration: underline; }
+.markdown-body ul, .markdown-body ol {
+  padding-left: 2rem;
+  margin-bottom: 1rem;
+}
+.markdown-body ul { list-style-type: disc; }
+.markdown-body ol { list-style-type: decimal; }
+.markdown-body li { margin-bottom: 0.25rem; }
+.markdown-body blockquote {
+  padding: 0 1rem;
+  color: #8b949e;
+  border-left: 0.25rem solid #30363d;
+  margin: 1rem 0;
+}
+.markdown-body code:not(pre code) {
+  padding: 0.2em 0.4em;
+  margin: 0;
+  font-size: 85%;
+  background-color: rgba(110, 118, 129, 0.4);
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.markdown-body pre {
+  padding: 1rem;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+.markdown-body table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+.markdown-body th, .markdown-body td {
+  padding: 6px 13px;
+  border: 1px solid #30363d;
+}
+.markdown-body th {
+  font-weight: 600;
+  background-color: #161b22;
+}
+.markdown-body tr:nth-child(2n) {
+  background-color: rgba(22, 27, 34, 0.5);
+}
+
+/* GitHub Heatmap Grid */
+.contribution-grid {
+  display: grid;
+  grid-template-rows: repeat(7, 12px);
+  grid-auto-flow: column;
+  grid-auto-columns: 12px;
+  gap: 3px;
+}
+.contribution-cell {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  background-color: #161b22;
+  border: 1px solid #21262d;
+}
+.contribution-cell.level-1 { background-color: #0e4429; border-color: #0e4429; }
+.contribution-cell.level-2 { background-color: #006d32; border-color: #006d32; }
+.contribution-cell.level-3 { background-color: #26a641; border-color: #26a641; }
+.contribution-cell.level-4 { background-color: #39d353; border-color: #39d353; }
